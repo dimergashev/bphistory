@@ -1,0 +1,1 @@
+import{K as f,E as o,e as s,C as i}from"./vue-vendor.CT4IcATu.js";function p(t,a){const e=f();if(!e)return;const n=()=>{try{return typeof t=="function"?t():!!i(t)}catch{return!1}},u=e.beforeEach(async(r,c)=>{if(r.path!==c.path&&n()){try{a?.()}catch{}await o(),await o()}return!0});s(()=>{try{u?.()}catch{}})}export{p as u};

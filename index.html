@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Favicons for all devices and browsers -->
+    <link rel="icon" href="/bphistory/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/bphistory/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/bphistory/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#4f46e5" />
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skrooge - AI-powered financial management</title>
+    <meta
+      name="description"
+      content="Manage your business finances with Skrooge. Track, analyze, and manage transactions in one place."
+    />
+    <meta
+      name="keywords"
+      content="finance, accounting, transaction management, document flow, business analytics"
+    />
+    <meta name="author" content="Skrooge Team" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://skrooge.app/" />
+    <meta property="og:title" content="Skrooge - AI-powered financial management" />
+    <meta
+      property="og:description"
+      content="Manage your business finances with Skrooge. Track, analyze, and manage transactions in one place."
+    />
+    <meta property="og:image" content="/og-image.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://skrooge.app/" />
+    <meta property="twitter:title" content="Skrooge - AI-powered financial management" />
+    <meta
+      property="twitter:description"
+      content="Manage your business finances with Skrooge. Track, analyze, and manage transactions in one place."
+    />
+    <meta property="twitter:image" content="/og-image.jpg" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+
+    <style>
+      #global-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      #lottie-loader {
+        width: 200px;
+        height: 200px;
+      }
+      .loader-text {
+        margin-top: 16px;
+        color: #2563eb;
+        font-size: 18px;
+        font-weight: 500;
+      }
+      iframe {
+        border: none !important;
+      }
+    </style>
+    <!-- Static Resource Error Handler - MUST be loaded before any other scripts -->
+    <script>
+      ;(function () {
+        'use strict'
+
+        // Fail-safe: If anything goes wrong, don't break the app
+        try {
+          // Check for required browser APIs
+          if (typeof window === 'undefined' || typeof document === 'undefined') {
+            return
+          }
+
+          // Fallback for Map if not supported (IE11)
+          var Map =
+            window.Map ||
+            function () {
+              var map = {}
+              var keys = []
+              return {
+                set: function (key, value) {
+                  if (keys.indexOf(key) === -1) keys.push(key)
+                  map[key] = value
+                },
+                get: function (key) {
+                  return map[key]
+                },
+                has: function (key) {
+                  return keys.indexOf(key) !== -1
+                },
+                delete: function (key) {
+                  var index = keys.indexOf(key)
+                  if (index !== -1) keys.splice(index, 1)
+                  delete map[key]
+                },
+                clear: function () {
+                  keys = []
+                  map = {}
+                }
+              }
+            }
+
+          // Fallback for Set if not supported (IE11)
+          var Set =
+            window.Set ||
+            function () {
+              var set = {}
+              var keys = []
+              return {
+                add: function (key) {
+                  if (keys.indexOf(key) === -1) {
+                    keys.push(key)
+                    set[key] = true
+                  }
+                },
+                has: function (key) {
+                  return keys.indexOf(key) !== -1
+                },
+                delete: function (key) {
+                  var index = keys.indexOf(key)
+                  if (index !== -1) keys.splice(index, 1)
+                  delete set[key]
+                },
+                clear: function () {
+                  keys = []
+                  set = {}
+                }
+              }
+            }
+
+          // Check if Promise is supported
+          if (typeof Promise === 'undefined') {
+            return
+          }
+
+          // Configuration
+          const RETRY_CONFIG = {
+            maxRetries: null, // null = unlimited retries until connection is restored
+            retryDelay: 5000, // 5 seconds between retries
+            retryableErrors: [
+              'ERR_CONNECTION_REFUSED',
+              'ERR_NETWORK',
+              'ERR_INTERNET_DISCONNECTED',
+              'ERR_NETWORK_CHANGED',
+              'ERR_FAILED',
+              'net::ERR_CONNECTION_REFUSED',
+              'net::ERR_NETWORK',
+              'NetworkError',
+              'Failed to fetch',
+              'Load failed'
+            ]
+          }
+
+          const failedResources = new Map()
+          const retryQueue = []
+          let isProcessingQueue = false
+
+          function isNetworkError(error) {
+            try {
+              if (!error) return false
+              const errorString = String(error).toLowerCase()
+              const errorMessage = error && error.message ? String(error.message).toLowerCase() : ''
+              const errorCode = error && error.code ? String(error.code).toLowerCase() : ''
+
+              return RETRY_CONFIG.retryableErrors.some(function (pattern) {
+                const patternLower = pattern.toLowerCase()
+                return (
+                  errorString.includes(patternLower) ||
+                  errorMessage.includes(patternLower) ||
+                  errorCode.includes(patternLower)
+                )
+              })
+            } catch (e) {
+              return false
+            }
+          }
+
+          function isNetworkErrorEvent(event) {
+            try {
+              if (event.message && isNetworkError(event.message)) return true
+              var target = event.target || event.srcElement
+              if (target && target.readyState === 0 && !target.src) return true
+              return false
+            } catch (e) {
+              return false
+            }
+          }
+
+          function retryResource(url, elementType, originalElement) {
+            return new Promise(function (resolve, reject) {
+              var retryInfo = failedResources.get(url)
+              if (!retryInfo) {
+                reject(new Error('Resource not in failed resources'))
+                return
+              }
+
+              retryInfo.retryCount++
+              retryInfo.lastAttempt = Date.now()
+
+              if (
+                RETRY_CONFIG.maxRetries !== null &&
+                retryInfo.retryCount > RETRY_CONFIG.maxRetries
+              ) {
+                failedResources.delete(url)
+                reject(new Error('Max retries exceeded'))
+                return
+              }
+
+              var newElement
+              if (elementType === 'script') {
+                newElement = document.createElement('script')
+                newElement.src = url
+                newElement.type = 'text/javascript'
+                newElement.async = (originalElement && originalElement.async) || false
+                newElement.defer = (originalElement && originalElement.defer) || false
+
+                newElement.onload = function () {
+                  failedResources.delete(url)
+                  resolve(newElement)
+                }
+
+                newElement.onerror = function (error) {
+                  if (isNetworkErrorEvent(error)) {
+                    setTimeout(function () {
+                      retryQueue.push({
+                        url: url,
+                        elementType: elementType,
+                        originalElement: originalElement,
+                        resolve: resolve,
+                        reject: reject
+                      })
+                    }, RETRY_CONFIG.retryDelay)
+                  } else {
+                    failedResources.delete(url)
+                    reject(error)
+                  }
+                }
+              } else if (elementType === 'link') {
+                var retryInfo = failedResources.get(url)
+                var linkRel =
+                  (retryInfo && retryInfo.rel) ||
+                  (originalElement && originalElement.rel) ||
+                  'stylesheet'
+                var linkAs =
+                  (retryInfo && retryInfo.as) || (originalElement && originalElement.as) || null
+
+                newElement = document.createElement('link')
+                newElement.rel = linkRel
+                newElement.href = url
+                newElement.type = (originalElement && originalElement.type) || 'text/css'
+
+                if (linkAs) {
+                  newElement.as = linkAs
+                }
+
+                // For fonts, also set crossorigin
+                if (linkAs === 'font' || url.match(/\.(woff|woff2|ttf|eot|otf)$/i)) {
+                  newElement.crossOrigin = 'anonymous'
+                }
+
+                newElement.onload = function () {
+                  failedResources.delete(url)
+                  resolve(newElement)
+                }
+
+                newElement.onerror = function (error) {
+                  if (isNetworkErrorEvent(error)) {
+                    setTimeout(function () {
+                      retryQueue.push({
+                        url: url,
+                        elementType: elementType,
+                        originalElement: originalElement,
+                        resolve: resolve,
+                        reject: reject
+                      })
+                    }, RETRY_CONFIG.retryDelay)
+                  } else {
+                    failedResources.delete(url)
+                    reject(error)
+                  }
+                }
+              } else if (elementType === 'img') {
+                newElement = document.createElement('img')
+                newElement.src = url
+
+                newElement.onload = function () {
+                  if (originalElement && originalElement.src !== url) {
+                    originalElement.src = url
+                  }
+                  failedResources.delete(url)
+                  resolve(newElement)
+                }
+
+                newElement.onerror = function (error) {
+                  if (isNetworkErrorEvent(error)) {
+                    setTimeout(function () {
+                      retryQueue.push({
+                        url: url,
+                        elementType: elementType,
+                        originalElement: originalElement,
+                        resolve: resolve,
+                        reject: reject
+                      })
+                    }, RETRY_CONFIG.retryDelay)
+                  } else {
+                    failedResources.delete(url)
+                    reject(error)
+                  }
+                }
+              } else if (elementType === 'video' || elementType === 'audio') {
+                newElement = document.createElement(elementType)
+                newElement.src = url
+
+                newElement.addEventListener('loadeddata', function () {
+                  if (originalElement && originalElement.src !== url) {
+                    originalElement.src = url
+                    originalElement.load()
+                  }
+                  failedResources.delete(url)
+                  resolve(newElement)
+                })
+
+                newElement.onerror = function (error) {
+                  if (isNetworkErrorEvent(error)) {
+                    setTimeout(function () {
+                      retryQueue.push({
+                        url: url,
+                        elementType: elementType,
+                        originalElement: originalElement,
+                        resolve: resolve,
+                        reject: reject
+                      })
+                    }, RETRY_CONFIG.retryDelay)
+                  } else {
+                    failedResources.delete(url)
+                    reject(error)
+                  }
+                }
+              } else if (elementType === 'iframe') {
+                newElement = document.createElement('iframe')
+                newElement.src = url
+                newElement.style.display =
+                  originalElement && originalElement.style ? originalElement.style.display : ''
+
+                newElement.onload = function () {
+                  if (originalElement && originalElement.src !== url) {
+                    originalElement.src = url
+                  }
+                  failedResources.delete(url)
+                  resolve(newElement)
+                }
+
+                newElement.onerror = function (error) {
+                  if (isNetworkErrorEvent(error)) {
+                    setTimeout(function () {
+                      retryQueue.push({
+                        url: url,
+                        elementType: elementType,
+                        originalElement: originalElement,
+                        resolve: resolve,
+                        reject: reject
+                      })
+                    }, RETRY_CONFIG.retryDelay)
+                  } else {
+                    failedResources.delete(url)
+                    reject(error)
+                  }
+                }
+              } else {
+                reject(new Error('Unsupported element type: ' + elementType))
+                return
+              }
+
+              if (elementType === 'script' || elementType === 'link') {
+                if (originalElement && originalElement.parentNode) {
+                  originalElement.parentNode.insertBefore(newElement, originalElement.nextSibling)
+                } else {
+                  document.head.appendChild(newElement)
+                }
+              } else if (elementType === 'img') {
+                // Image will load automatically when src is set
+                newElement.src = url
+              } else if (elementType === 'video' || elementType === 'audio') {
+                // Media elements need to be appended to DOM or replace original
+                if (originalElement && originalElement.parentNode) {
+                  originalElement.parentNode.replaceChild(newElement, originalElement)
+                } else if (originalElement) {
+                  // If no parent, just update src
+                  originalElement.src = url
+                  originalElement.load()
+                }
+              } else if (elementType === 'iframe') {
+                // Iframe needs to be appended or replace original
+                if (originalElement && originalElement.parentNode) {
+                  originalElement.parentNode.replaceChild(newElement, originalElement)
+                } else if (originalElement) {
+                  originalElement.src = url
+                }
+              }
+            })
+          }
+
+          function processRetryQueue() {
+            if (retryQueue.length === 0 || isProcessingQueue) return
+            isProcessingQueue = true
+
+            var item = retryQueue.shift()
+            if (!item) {
+              isProcessingQueue = false
+              return
+            }
+
+            retryResource(item.url, item.elementType, item.originalElement)
+              .then(function () {
+                if (item.resolve) item.resolve()
+                isProcessingQueue = false
+                if (retryQueue.length > 0) {
+                  setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+                }
+              })
+              .catch(function (error) {
+                if (isNetworkError(error)) {
+                  retryQueue.push(item)
+                } else {
+                  if (item.reject) item.reject(error)
+                }
+                isProcessingQueue = false
+                if (retryQueue.length > 0) {
+                  setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+                }
+              })
+          }
+
+          function handleScriptError(event) {
+            var target = event.target || event.srcElement
+            var url = (target && target.src) || event.filename
+
+            if (!url) return
+            if (!url.startsWith('http') && !url.startsWith('/')) return
+            if (!isNetworkErrorEvent(event)) return
+
+            if (!failedResources.has(url)) {
+              failedResources.set(url, {
+                element: target,
+                elementType: 'script',
+                retryCount: 0,
+                lastAttempt: Date.now()
+              })
+
+              retryQueue.push({
+                url: url,
+                elementType: 'script',
+                originalElement: target
+              })
+
+              if (retryQueue.length === 1) {
+                setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+              }
+            }
+          }
+
+          function handleLinkError(event) {
+            var target = event.target || event.srcElement
+            var url = target && target.href
+
+            if (!url) return
+            if (url.startsWith('data:')) return
+            if (!isNetworkErrorEvent(event)) return
+
+            var rel = (target && target.rel) || ''
+            var resourceType = 'stylesheet'
+            if (rel === 'preload' || rel === 'prefetch') {
+              resourceType = rel
+              // Check if it's a font resource
+              if (target.as === 'font' || url.match(/\.(woff|woff2|ttf|eot|otf)$/i)) {
+                resourceType = 'font'
+              }
+            }
+
+            if (!failedResources.has(url)) {
+              failedResources.set(url, {
+                element: target,
+                elementType: 'link',
+                retryCount: 0,
+                lastAttempt: Date.now(),
+                rel: rel,
+                as: target.as || null
+              })
+
+              retryQueue.push({
+                url: url,
+                elementType: 'link',
+                originalElement: target
+              })
+
+              if (retryQueue.length === 1) {
+                setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+              }
+            }
+          }
+
+          function handleImageError(event) {
+            var target = event.target || event.srcElement
+            var url = target && target.src
+
+            if (!url) return
+            if (url.startsWith('data:') || url.startsWith('placeholder://')) return
+            if (!isNetworkErrorEvent(event)) return
+
+            if (!failedResources.has(url)) {
+              failedResources.set(url, {
+                element: target,
+                elementType: 'img',
+                retryCount: 0,
+                lastAttempt: Date.now()
+              })
+
+              retryQueue.push({
+                url: url,
+                elementType: 'img',
+                originalElement: target
+              })
+
+              if (retryQueue.length === 1) {
+                setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+              }
+            }
+          }
+
+          function handleMediaError(event, mediaType) {
+            var target = event.target || event.srcElement
+            var url = target && target.src
+
+            if (!url) return
+            if (url.startsWith('data:')) return
+            if (!isNetworkErrorEvent(event)) return
+
+            if (!failedResources.has(url)) {
+              failedResources.set(url, {
+                element: target,
+                elementType: mediaType,
+                retryCount: 0,
+                lastAttempt: Date.now()
+              })
+
+              retryQueue.push({
+                url: url,
+                elementType: mediaType,
+                originalElement: target
+              })
+
+              if (retryQueue.length === 1) {
+                setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+              }
+            }
+          }
+
+          function handleIframeError(event) {
+            var target = event.target || event.srcElement
+            var url = target && target.src
+
+            if (!url) return
+            if (url.startsWith('data:')) return
+
+            // Be careful with iframes - only retry same-origin or trusted sources
+            try {
+              var currentOrigin = window.location.origin
+              var iframeOrigin = new URL(url).origin
+
+              // Only retry if same origin or if it's a trusted CDN
+              if (iframeOrigin !== currentOrigin && !isTrustedCDN(url)) {
+                return
+              }
+            } catch (e) {
+              // Invalid URL, skip
+              return
+            }
+
+            if (!isNetworkErrorEvent(event)) return
+
+            if (!failedResources.has(url)) {
+              failedResources.set(url, {
+                element: target,
+                elementType: 'iframe',
+                retryCount: 0,
+                lastAttempt: Date.now()
+              })
+
+              retryQueue.push({
+                url: url,
+                elementType: 'iframe',
+                originalElement: target
+              })
+
+              if (retryQueue.length === 1) {
+                setTimeout(processRetryQueue, RETRY_CONFIG.retryDelay)
+              }
+            }
+          }
+
+          function isTrustedCDN(url) {
+            // List of trusted CDNs that can be safely retried
+            var trustedCDNs = [
+              'fonts.googleapis.com',
+              'fonts.gstatic.com',
+              'cdn.jsdelivr.net',
+              'unpkg.com',
+              'cdnjs.cloudflare.com'
+            ]
+
+            return trustedCDNs.some(function (cdn) {
+              return url.indexOf(cdn) !== -1
+            })
+          }
+
+          // Handle all resource loading errors
+          window.addEventListener(
+            'error',
+            function (event) {
+              var target = event.target || event.srcElement
+
+              if (!target) return
+
+              var tagName = target.tagName
+
+              // Handle script errors
+              if (tagName === 'SCRIPT') {
+                handleScriptError(event)
+              }
+              // Handle stylesheet errors
+              else if (
+                tagName === 'LINK' &&
+                (target.rel === 'stylesheet' ||
+                  target.rel === 'preload' ||
+                  target.rel === 'prefetch')
+              ) {
+                handleLinkError(event)
+              }
+              // Handle image errors
+              else if (tagName === 'IMG') {
+                handleImageError(event)
+              }
+              // Handle video errors
+              else if (tagName === 'VIDEO') {
+                handleMediaError(event, 'video')
+              }
+              // Handle audio errors
+              else if (tagName === 'AUDIO') {
+                handleMediaError(event, 'audio')
+              }
+              // Handle source element errors (used in video/audio)
+              else if (tagName === 'SOURCE') {
+                var parent = target.parentNode
+                if (parent && (parent.tagName === 'VIDEO' || parent.tagName === 'AUDIO')) {
+                  handleMediaError(event, parent.tagName.toLowerCase())
+                }
+              }
+              // Handle iframe errors (but be careful - only for same-origin or trusted sources)
+              else if (tagName === 'IFRAME') {
+                handleIframeError(event)
+              }
+            },
+            true
+          )
+
+          // Handle dynamic imports (for Vite code splitting)
+          window.addEventListener('unhandledrejection', function (event) {
+            var error = event.reason
+
+            if (error && error.message) {
+              var errorMessage = String(error.message).toLowerCase()
+
+              if (
+                errorMessage.includes('failed to fetch') ||
+                errorMessage.includes('loading chunk') ||
+                errorMessage.includes('loading css chunk') ||
+                errorMessage.includes('chunk load failed') ||
+                errorMessage.includes('import.meta') ||
+                isNetworkError(error)
+              ) {
+                var modulePath = null
+                var urlMatch = error.message.match(/https?:\/\/[^\s"']+|\.\/[^\s"']+|\/[^\s"']+/)
+                if (urlMatch) {
+                  modulePath = urlMatch[0]
+                } else if (error.url) {
+                  modulePath = error.url
+                } else if (error.filename) {
+                  modulePath = error.filename
+                }
+
+                if (modulePath && !window.__dynamicImportRetries) {
+                  window.__dynamicImportRetries = new Set()
+                }
+
+                if (
+                  modulePath &&
+                  window.__dynamicImportRetries &&
+                  !window.__dynamicImportRetries.has(modulePath)
+                ) {
+                  window.__dynamicImportRetries.add(modulePath)
+
+                  function retryDynamicImport(path, count) {
+                    count = count || 0
+                    if (RETRY_CONFIG.maxRetries !== null && count > RETRY_CONFIG.maxRetries) {
+                      return Promise.reject(new Error('Max retries exceeded'))
+                    }
+
+                    return import(path)
+                      .then(function (module) {
+                        if (window.__dynamicImportRetries) {
+                          window.__dynamicImportRetries.delete(path)
+                        }
+                        return module
+                      })
+                      .catch(function (importError) {
+                        if (isNetworkError(importError)) {
+                          return new Promise(function (resolve, reject) {
+                            setTimeout(function () {
+                              retryDynamicImport(path, count + 1)
+                                .then(resolve)
+                                .catch(reject)
+                            }, RETRY_CONFIG.retryDelay)
+                          })
+                        } else {
+                          if (window.__dynamicImportRetries) {
+                            window.__dynamicImportRetries.delete(path)
+                          }
+                          return Promise.reject(importError)
+                        }
+                      })
+                  }
+
+                  retryDynamicImport(modulePath).catch(function (err) {
+                    // Silent fail - retry will continue automatically
+                  })
+                }
+              }
+            }
+          })
+
+          // Monitor network status and retry failed resources when connection is restored
+          if ('ononline' in window) {
+            window.addEventListener('online', function () {
+              if (retryQueue.length > 0) {
+                processRetryQueue()
+              }
+            })
+          }
+        } catch (e) {
+          // Critical: If initialization fails, don't break the app
+          // App will continue to load normally without retry handler
+        }
+      })()
+    </script>
+    <script type="module" crossorigin src="/bphistory/assets/index.C5UMSYdr.js"></script>
+    <link rel="modulepreload" crossorigin href="/bphistory/assets/vue-vendor.CT4IcATu.js">
+    <link rel="modulepreload" crossorigin href="/bphistory/assets/utils-vendor.C5noEFev.js">
+    <link rel="modulepreload" crossorigin href="/bphistory/assets/aws-vendor.BmGS-6e9.js">
+    <link rel="modulepreload" crossorigin href="/bphistory/assets/monitoring-vendor.Kw_R0_KG.js">
+    <link rel="stylesheet" crossorigin href="/bphistory/assets/index.BE4uISYj.css">
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="global-loader">
+      <iframe
+        width="400"
+        height="400"
+        src="https://lottie.host/embed/e75b1f88-bb5a-4007-99a1-813d5afdda83/NukB1hTiPY.lottie"
+      ></iframe>
+    </div>
+  </body>
+</html>

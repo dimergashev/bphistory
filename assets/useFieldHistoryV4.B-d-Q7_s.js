@@ -1,0 +1,1 @@
+import{u as o}from"./useFieldHistoryV3.BIe0lD7f.js";import{C as r,I as t,S as a}from"./copy.CDAs1OhC.js";function n(){return{...o(),shortCaption:s=>a[s]||"",INFO_RULES:t,COUNTED_AFTER_SAVE:r}}export{n as u};
